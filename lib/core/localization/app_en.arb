@@ -1,0 +1,6 @@
+{
+  "appTitle": "fire_playground",
+  "@appTitle": {
+    "description": "The title of the application"
+  }
+}
