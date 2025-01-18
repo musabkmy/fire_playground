@@ -1,25 +1,26 @@
 import 'package:fire_playground/features/create_event/models/event_category.dart';
+import 'package:fire_playground/features/create_event/providers/page_controller_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class BuildDetailsLayout extends StatefulWidget {
-  const BuildDetailsLayout({
-    super.key,
-  });
+class EventDetailsLayout extends StatefulWidget {
+  const EventDetailsLayout({super.key});
 
   @override
-  State<BuildDetailsLayout> createState() => _BuildDetailsLayoutState();
+  State<EventDetailsLayout> createState() => _EventDetailsLayoutState();
 }
 
-class _BuildDetailsLayoutState extends State<BuildDetailsLayout> {
+class _EventDetailsLayoutState extends State<EventDetailsLayout> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
 
   EventCategory? _selectedItem;
 
   @override
   Widget build(BuildContext context) {
+    final pageControllerProvider = Provider.of<PageControllerProvider>(context);
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
@@ -38,11 +39,9 @@ class _BuildDetailsLayoutState extends State<BuildDetailsLayout> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8.0))),
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Form submitted successfully')),
-                    );
-                  }
+                  if (_formKey.currentState!.validate()) {}
+
+                  pageControllerProvider.nextPage;
                 },
                 child: Text(
                   'Submit',

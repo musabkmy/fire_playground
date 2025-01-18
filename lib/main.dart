@@ -1,13 +1,21 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fire_playground/app.dart';
+import 'package:fire_playground/error_layout.dart';
+import 'package:fire_playground/features/create_event/providers/page_controller_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  //handle errors
+  FlutterError.onError = (details) {
+    FlutterError.dumpErrorToConsole(details);
+    runApp(ErrorLayout(errorDetails: details));
+  };
+
   // Isolate.spawn(entryPoint, message)
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -44,5 +52,7 @@ void main() async {
   //       AnalyticsEventItem(itemName: 'Socks', itemId: 'xjw73ndnw', price: 10.0),
   //     ],
   //     coupon: '10PERCENTOFF');
-  runApp(MyApp());
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) => PageControllerProvider()),
+  ], child: MyApp()));
 }

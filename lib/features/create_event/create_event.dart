@@ -1,8 +1,9 @@
 import 'package:fire_playground/features/create_event/data/create_event_data.dart';
-import 'package:fire_playground/features/create_event/layouts/build_details_layout.dart';
+import 'package:fire_playground/features/create_event/layouts/event_details_layout.dart';
 import 'package:fire_playground/features/create_event/providers/page_controller_provider.dart';
 import 'package:fire_playground/features/create_event/shared/rectangle_painter.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class CreateEvent extends StatefulWidget {
   const CreateEvent({super.key});
@@ -13,14 +14,9 @@ class CreateEvent extends StatefulWidget {
 
 class _CreateEventState extends State<CreateEvent> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final PageControllerProvider pageControllerProvider =
-        PageControllerProvider();
+    PageControllerProvider pageControllerProvider =
+        Provider.of<PageControllerProvider>(context);
     return Scaffold(
         appBar: AppBar(
           title: Text('Add Event'),
@@ -37,7 +33,7 @@ class _CreateEventState extends State<CreateEvent> {
                 controller: pageControllerProvider.pageController,
                 itemCount: pageControllerProvider.numberOfPages,
                 itemBuilder: (context, index) => index == 0
-                    ? BuildDetailsLayout()
+                    ? EventDetailsLayout()
                     : index == 1
                         ? Placeholder()
                         : Placeholder(),
@@ -65,8 +61,7 @@ class BuildStepTop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PageControllerProvider pageControllerProvider =
-        PageControllerProvider();
+    final pageControllerProvider = PageControllerProvider();
     return Expanded(
         child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
