@@ -1,10 +1,12 @@
-import 'package:fire_playground/features/create_event/providers/page_controller_provider.dart';
+import 'package:fire_playground/features/create_event/constants.dart';
+import 'package:fire_playground/features/create_event/models/event_location_type.dart';
+import 'package:fire_playground/features/create_event/shared_layout/app_text_form_field.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class EventDateAndLocationLayout extends StatefulWidget {
   static const String id = 'EventDateAndLocationLayout';
-  const EventDateAndLocationLayout({super.key});
+  const EventDateAndLocationLayout({super.key, required this.formKey});
+  final GlobalKey<FormState> formKey;
 
   @override
   State<EventDateAndLocationLayout> createState() =>
@@ -13,8 +15,14 @@ class EventDateAndLocationLayout extends StatefulWidget {
 
 class _EventDateAndLocationLayoutState
     extends State<EventDateAndLocationLayout> {
-  final _formKey = GlobalKey<FormState>();
   DateTime? _selectedDate;
+
+  TimeOfDay? _selectedStartTime;
+  TimeOfDay? _selectedEndTime;
+
+  EventLocationType? _selectedLocationOption;
+  final _locationDescriptionController = TextEditingController();
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -22,6 +30,7 @@ class _EventDateAndLocationLayoutState
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
+
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
@@ -29,22 +38,179 @@ class _EventDateAndLocationLayoutState
     }
   }
 
+  Future<void> _selectStartTime(BuildContext context) async {
+    final TimeOfDay? picked =
+        await showTimePicker(context: context, initialTime: TimeOfDay.now());
+
+    if (picked != null && picked != _selectedStartTime) {
+      setState(() {
+        _selectedStartTime = picked;
+      });
+    }
+  }
+
+  Future<void> _selectEndTime(BuildContext context) async {
+    if (_selectedStartTime != null) {
+      final TimeOfDay? picked = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay(
+              hour: _selectedStartTime!.hour + 2,
+              minute: _selectedStartTime!.minute));
+
+      if (picked != null && picked != _selectedEndTime) {
+        setState(() {
+          _selectedEndTime = picked;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final pageControllerProvider = Provider.of<PageControllerProvider>(context);
+    // final pageControllerProvider = Provider.of<PageControllerProvider>(context);
 
-    return Form(
-      key: _formKey,
-      child: SingleChildScrollView(
-        child: Column(
-          spacing: 8,
-          children: [
-            OutlinedButton(
-                onPressed: () => _selectDate(context),
-                child: Text(_selectedDate?.toIso8601String() ?? 'Event Date'))
-          ],
-        ),
+    return SingleChildScrollView(
+      child: Column(
+        spacing: 20,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            spacing: 4,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Date',
+                style:
+                    TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+              ),
+              SizedBox(
+                width: 200,
+                child: OutlinedButton(
+                  style: buttonStyle,
+                  onPressed: () => _selectDate(context),
+                  child: _buildDateTimeFormat(
+                    dateFormat(_selectedDate) ?? 'Event Date',
+                    Icons.calendar_month,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            spacing: 16,
+            children: [
+              Column(
+                spacing: 4,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'From',
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(
+                    width: 145,
+                    child: OutlinedButton(
+                      style: buttonStyle,
+                      onPressed: () => _selectStartTime(context),
+                      child: _buildDateTimeFormat(
+                        timeFormat(context, _selectedStartTime) ?? '--:--',
+                        Icons.access_time_rounded,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                spacing: 4,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'To',
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(
+                    width: 145,
+                    child: OutlinedButton(
+                      style: buttonStyle,
+                      onPressed: () => _selectEndTime(context),
+                      child: _buildDateTimeFormat(
+                        timeFormat(context, _selectedEndTime) ?? '--:--',
+                        Icons.access_time_rounded,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Column(
+            spacing: 4,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 12),
+              Text(
+                'Location',
+                style:
+                    TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+              ),
+              ...EventLocationType.values.map((option) {
+                return Column(
+                  spacing: 4,
+                  children: [
+                    RadioListTile<EventLocationType>(
+                      title: Text(
+                        option.label,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      activeColor: Colors.blueAccent,
+                      hoverColor: Colors.transparent,
+                      value: option,
+                      contentPadding: EdgeInsets.all(0),
+                      groupValue: _selectedLocationOption,
+                      onChanged: (EventLocationType? value) {
+                        setState(() {
+                          _selectedLocationOption = value;
+                          _locationDescriptionController.text = '';
+                        });
+                      },
+                    ),
+                    if (_selectedLocationOption == option)
+                      TextFormField(
+                        key: Key(option.label),
+                        controller: _locationDescriptionController,
+                        decoration: InputDecoration(
+                          labelText: option.hint,
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
+                  ],
+                );
+              }),
+            ],
+          ),
+        ],
       ),
+    );
+  }
+
+  Row _buildDateTimeFormat(String label, IconData iconData) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+              color: Colors.black, fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        Icon(
+          iconData,
+          size: 24,
+          color: Colors.black,
+        ),
+      ],
     );
   }
 }

@@ -1,10 +1,10 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fire_playground/app.dart';
 import 'package:fire_playground/error_layout.dart';
-import 'package:fire_playground/features/create_event/providers/page_controller_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -14,6 +14,16 @@ void main() async {
   FlutterError.onError = (details) {
     FlutterError.dumpErrorToConsole(details);
     runApp(ErrorLayout(errorDetails: details));
+  };
+
+  // Handle uncaught exceptions (e.g., from async code)
+  PlatformDispatcher.instance.onError = (error, stack) {
+    // Log the error or show a dialog
+    debugPrint("Uncaught exception: $error\nStack trace: $stack");
+    // Navigate to an error screen or show a dialog
+    runApp(ErrorLayout(
+        errorDetails: FlutterErrorDetails(exception: error, stack: stack)));
+    return true; // Prevent the app from crashing
   };
 
   // Isolate.spawn(entryPoint, message)
@@ -52,7 +62,5 @@ void main() async {
   //       AnalyticsEventItem(itemName: 'Socks', itemId: 'xjw73ndnw', price: 10.0),
   //     ],
   //     coupon: '10PERCENTOFF');
-  runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(create: (_) => PageControllerProvider()),
-  ], child: MyApp()));
+  runApp(MyApp());
 }

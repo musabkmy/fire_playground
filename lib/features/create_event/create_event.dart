@@ -1,4 +1,5 @@
 import 'package:fire_playground/features/create_event/data/create_event_data.dart';
+import 'package:fire_playground/features/create_event/layouts/event_date_and_location_layout.dart';
 import 'package:fire_playground/features/create_event/layouts/event_details_layout.dart';
 import 'package:fire_playground/features/create_event/providers/page_controller_provider.dart';
 import 'package:fire_playground/features/create_event/shared/rectangle_painter.dart';
@@ -13,10 +14,12 @@ class CreateEvent extends StatefulWidget {
 }
 
 class _CreateEventState extends State<CreateEvent> {
+  final _detailsFormKey = GlobalKey<FormState>();
+  final _dateAndLocationFormKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
-    PageControllerProvider pageControllerProvider =
-        Provider.of<PageControllerProvider>(context);
+    final pageControllerProvider = Provider.of<PageControllerProvider>(context);
     return Scaffold(
         appBar: AppBar(
           title: Text('Add Event'),
@@ -27,18 +30,22 @@ class _CreateEventState extends State<CreateEvent> {
             SizedBox(height: 24),
             BuildTop(),
             _buildSteps(),
-            SizedBox(height: 24),
             Expanded(
               child: PageView.builder(
                 controller: pageControllerProvider.pageController,
                 itemCount: pageControllerProvider.numberOfPages,
+                physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) => index == 0
-                    ? EventDetailsLayout()
+                    ? EventDetailsLayout(formKey: _detailsFormKey)
                     : index == 1
-                        ? Placeholder()
+                        ? EventDateAndLocationLayout(
+                            formKey: _dateAndLocationFormKey)
                         : Placeholder(),
               ),
-            )
+            ),
+            // SizedBox(height: 16),
+            BuildActionButton(pageControllerProvider: pageControllerProvider),
+            SizedBox(height: 24),
           ]),
         ));
   }
@@ -46,8 +53,63 @@ class _CreateEventState extends State<CreateEvent> {
   Widget _buildSteps() {
     return Row(
       spacing: 16,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children:
           stepTopData.entries.map((step) => BuildStepTop(item: step)).toList(),
+    );
+  }
+}
+
+class BuildActionButton extends StatelessWidget {
+  const BuildActionButton({
+    super.key,
+    required this.pageControllerProvider,
+  });
+
+  final PageControllerProvider pageControllerProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        pageControllerProvider.atDetails
+            ? SizedBox()
+            : MaterialButton(
+                onPressed: pageControllerProvider.previousPage,
+                child: Text(
+                  'Back',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14),
+                ),
+              ),
+        MaterialButton(
+          color: Colors.blueAccent,
+          height: 48,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8.0))),
+          onPressed: pageControllerProvider.atLastPage
+              ? () {}
+              : () {
+                  pageControllerProvider.nextPage();
+
+                  // if ((pageControllerProvider.atDetails &&
+                  //         _detailsFormKey.currentState!.validate()) ||
+                  //     (pageControllerProvider.atDateAndLocation &&
+                  //         _dateAndLocationFormKey.currentState!
+                  //             .validate())) {
+                  //   pageControllerProvider.nextPage();
+                  // }
+                },
+          child: Text(
+            pageControllerProvider.atLastPage ? 'Submit' : 'Next',
+            style: TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -61,29 +123,32 @@ class BuildStepTop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pageControllerProvider = PageControllerProvider();
+    final pageControllerProvider = Provider.of<PageControllerProvider>(context);
     return Expanded(
+        key: Key(item.key),
         child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CustomPaint(
-          size: Size(double.maxFinite, 4),
-          painter: RRectanglePainter(
-              isClicked: item.value == pageControllerProvider.page),
-        ),
-        Text(
-          item.key,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            height: 2,
-            color: item.value == pageControllerProvider.page
-                ? Colors.blueAccent
-                : Colors.grey.shade400,
-          ),
-        ),
-      ],
-    ));
+          spacing: 4,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CustomPaint(
+              size: Size(double.maxFinite, 4),
+              painter: RRectanglePainter(
+                  isClicked:
+                      item.value == pageControllerProvider.currentPageIndex),
+            ),
+            Text(
+              item.key,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                height: 1.1,
+                color: item.value == pageControllerProvider.currentPageIndex
+                    ? Colors.blueAccent
+                    : Colors.grey.shade400,
+              ),
+            ),
+          ],
+        ));
   }
 }
 

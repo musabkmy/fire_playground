@@ -1,9 +1,11 @@
-enum EventLocationType {
-  virtual('Virtual', 'Meeting address'),
-  physical('Physical', 'Link to the meeting');
-
+class EventLocationType {
+  EventLocationType._(this.label, this.hint);
   final String label;
   final String hint;
 
-  const EventLocationType(this.label, this.hint);
+  static final _virtual = EventLocationType._('Virtual', 'Meeting address');
+  static final _physical =
+      EventLocationType._('Physical', 'Link to the meeting');
+
+  static final values = [_virtual, _physical];
 }

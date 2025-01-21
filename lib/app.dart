@@ -1,7 +1,6 @@
 import 'package:fire_playground/features/auth/login.dart';
 import 'package:fire_playground/features/auth/signup.dart';
 import 'package:fire_playground/features/create_event/create_event.dart';
-import 'package:fire_playground/features/create_event/layouts/event_date_and_location_layout.dart';
 import 'package:fire_playground/features/create_event/providers/page_controller_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -33,18 +32,22 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      restorationScopeId: 'app',
-      theme: ThemeData(),
-      darkTheme: ThemeData.dark(),
-      debugShowCheckedModeBanner: false,
-      home: CreateEvent(),
-      routes: {
-        "signup": (context) => SignUp(),
-        "login": (context) => Login(),
-        "CreateEvent": (context) => CreateEvent(),
-        "EventDateAndLocationLayout": (context) => EventDateAndLocationLayout(),
-      },
-    );
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => PageControllerProvider()),
+          // ChangeNotifierProvider(create: (_) => AppViewControllerProvider()),
+        ],
+        child: MaterialApp(
+          restorationScopeId: 'app',
+          theme: ThemeData(),
+          darkTheme: ThemeData.dark(),
+          debugShowCheckedModeBanner: false,
+          home: CreateEvent(),
+          routes: {
+            "signup": (context) => SignUp(),
+            "login": (context) => Login(),
+            "CreateEvent": (context) => CreateEvent(),
+          },
+        ));
   }
 }
