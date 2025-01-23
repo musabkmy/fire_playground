@@ -21,6 +21,7 @@ class _EventDetailsLayoutState extends State<EventDetailsLayout> {
     return Form(
       key: widget.formKey,
       child: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 8,
           children: [

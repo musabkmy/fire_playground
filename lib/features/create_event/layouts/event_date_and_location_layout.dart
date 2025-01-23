@@ -27,8 +27,8 @@ class _EventDateAndLocationLayoutState
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(Duration(days: 60)),
     );
 
     if (picked != null && picked != _selectedDate) {
@@ -62,6 +62,21 @@ class _EventDateAndLocationLayoutState
           _selectedEndTime = picked;
         });
       }
+    } else {
+      ScaffoldMessenger.of(context).showMaterialBanner(
+        MaterialBanner(
+          content: Text('Please select the start time first'),
+          // duration: Duration(seconds: 2),
+          actions: [
+            TextButton(
+              onPressed: () {
+                ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
     }
   }
 
@@ -70,6 +85,7 @@ class _EventDateAndLocationLayoutState
     // final pageControllerProvider = Provider.of<PageControllerProvider>(context);
 
     return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 24.0),
       child: Column(
         spacing: 20,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,26 +175,29 @@ class _EventDateAndLocationLayoutState
                 return Column(
                   spacing: 4,
                   children: [
-                    RadioListTile<EventLocationType>(
-                      title: Text(
-                        option.label,
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                    Theme(
+                      data: Theme.of(context)
+                          .copyWith(splashColor: Colors.transparent),
+                      child: RadioListTile<EventLocationType>(
+                        title: Text(
+                          option.label,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        activeColor: Colors.blueAccent,
+                        value: option,
+                        contentPadding: EdgeInsets.all(0),
+                        groupValue: _selectedLocationOption,
+                        onChanged: (EventLocationType? value) {
+                          setState(() {
+                            _selectedLocationOption = value;
+                            _locationDescriptionController.text = '';
+                          });
+                        },
                       ),
-                      activeColor: Colors.blueAccent,
-                      hoverColor: Colors.transparent,
-                      value: option,
-                      contentPadding: EdgeInsets.all(0),
-                      groupValue: _selectedLocationOption,
-                      onChanged: (EventLocationType? value) {
-                        setState(() {
-                          _selectedLocationOption = value;
-                          _locationDescriptionController.text = '';
-                        });
-                      },
                     ),
                     if (_selectedLocationOption == option)
                       TextFormField(
-                        key: Key(option.label),
+                        // key: Key(option.label),
                         controller: _locationDescriptionController,
                         decoration: InputDecoration(
                           labelText: option.hint,

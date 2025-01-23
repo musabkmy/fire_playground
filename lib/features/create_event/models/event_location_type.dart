@@ -3,9 +3,8 @@ class EventLocationType {
   final String label;
   final String hint;
 
-  static final _virtual = EventLocationType._('Virtual', 'Meeting address');
-  static final _physical =
-      EventLocationType._('Physical', 'Link to the meeting');
+  static final _physical = EventLocationType._('Physical', 'Meeting address');
+  static final _virtual = EventLocationType._('Virtual', 'Link to the meeting');
 
-  static final values = [_virtual, _physical];
+  static final values = [_physical, _virtual];
 }
