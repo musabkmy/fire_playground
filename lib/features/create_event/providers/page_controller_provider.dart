@@ -18,11 +18,8 @@ class PageControllerProvider with ChangeNotifier {
   bool get atLastPage => _currentPageIndex >= _numberOfPages - 1;
 
   void setCurrentPageIndex(int index) {
-    if (_currentPageIndex != index) {
-      debugPrint('Updating index to $index');
-      _currentPageIndex = index;
-      notifyListeners();
-    }
+    _currentPageIndex = index;
+    notifyListeners();
   }
 
   Future<void> nextPage({
