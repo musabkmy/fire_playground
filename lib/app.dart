@@ -1,6 +1,7 @@
 import 'package:fire_playground/features/auth/login.dart';
 import 'package:fire_playground/features/auth/signup.dart';
 import 'package:fire_playground/features/create_event/create_event.dart';
+import 'package:fire_playground/features/create_event/providers/create_event_provider.dart';
 import 'package:fire_playground/features/create_event/providers/page_controller_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,7 +36,7 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => PageControllerProvider()),
-          // ChangeNotifierProvider(create: (_) => AppViewControllerProvider()),
+          ChangeNotifierProvider(create: (_) => CreateEventProvider()),
         ],
         child: MaterialApp(
           restorationScopeId: 'app',

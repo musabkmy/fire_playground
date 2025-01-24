@@ -9,20 +9,20 @@ class CreateEventProvider extends ChangeNotifier {
 
   CreateEventProvider() : _createEventModel = CreateEventModel();
 
-  set details(EventDetailsModel eventDetails) {
+  set eventDetails(EventDetailsModel eventDetails) {
     _createEventModel.eventDetails = eventDetails;
-    notifyListeners();
+    // notifyListeners();
   }
 
-  bool isDetailsNull() => _createEventModel.eventDetails == null;
+  bool isEventDetailsCreated() => _createEventModel.eventDetails != null;
 
   set dateAndLocation(EventDateAndLocationModel eventDateAndLocation) {
     _createEventModel.eventDateAndLocation = eventDateAndLocation;
     notifyListeners();
   }
 
-  bool isDateAndLocationNull() =>
-      _createEventModel.eventDateAndLocation == null;
+  bool isEventDateAndLocationCreated() =>
+      _createEventModel.eventDateAndLocation != null;
 
   void addSpeaker(EventSpeakerModel speaker) {
     _createEventModel.speakers.add(speaker);

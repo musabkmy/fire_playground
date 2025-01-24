@@ -2,6 +2,7 @@ import 'package:fire_playground/features/create_event/data/create_event_data.dar
 import 'package:fire_playground/features/create_event/layouts/event_date_and_location_layout.dart';
 import 'package:fire_playground/features/create_event/layouts/event_details_layout.dart';
 import 'package:fire_playground/features/create_event/layouts/event_speakers_layout.dart';
+import 'package:fire_playground/features/create_event/providers/create_event_provider.dart';
 import 'package:fire_playground/features/create_event/providers/page_controller_provider.dart';
 import 'package:fire_playground/features/create_event/shared/rectangle_painter.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,6 @@ class CreateEvent extends StatefulWidget {
 }
 
 class _CreateEventState extends State<CreateEvent> {
-  final _detailsFormKey = GlobalKey<FormState>();
   final _dateAndLocationFormKey = GlobalKey<FormState>();
 
   @override
@@ -43,15 +43,16 @@ class _CreateEventState extends State<CreateEvent> {
               itemCount: pageControllerProvider.numberOfPages,
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) => index == 0
-                  ? EventDetailsLayout(formKey: _detailsFormKey)
+                  ? EventDetailsLayout()
                   : index == 1
                       ? EventDateAndLocationLayout(
                           formKey: _dateAndLocationFormKey)
                       : EventSpeakersLayout(),
             ),
           ),
-          // SizedBox(height: 16),
-          BuildActionButton(pageControllerProvider: pageControllerProvider),
+          // BuildActionButton(
+          //     pageControllerProvider: pageControllerProvider,
+          //     detailsFormKey: _detailsFormKey),
           SizedBox(height: 24),
         ]));
   }
@@ -65,65 +66,6 @@ class _CreateEventState extends State<CreateEvent> {
         children: stepTopData.entries
             .map((step) => BuildStepTop(item: step))
             .toList(),
-      ),
-    );
-  }
-}
-
-class BuildActionButton extends StatelessWidget {
-  const BuildActionButton({
-    super.key,
-    required this.pageControllerProvider,
-  });
-
-  final PageControllerProvider pageControllerProvider;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          pageControllerProvider.atDetails
-              ? SizedBox()
-              : MaterialButton(
-                  onPressed: pageControllerProvider.previousPage,
-                  child: Text(
-                    'Back',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14),
-                  ),
-                ),
-          MaterialButton(
-            color: Colors.blueAccent,
-            height: 48,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8.0))),
-            onPressed: pageControllerProvider.atLastPage
-                ? () {}
-                : () {
-                    pageControllerProvider.nextPage();
-
-                    // if ((pageControllerProvider.atDetails &&
-                    //         _detailsFormKey.currentState!.validate()) ||
-                    //     (pageControllerProvider.atDateAndLocation &&
-                    //         _dateAndLocationFormKey.currentState!
-                    //             .validate())) {
-                    //   pageControllerProvider.nextPage();
-                    // }
-                  },
-            child: Text(
-              pageControllerProvider.atLastPage ? 'Submit' : 'Next',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14),
-            ),
-          ),
-        ],
       ),
     );
   }

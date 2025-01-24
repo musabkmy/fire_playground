@@ -1,16 +1,22 @@
 import 'package:fire_playground/features/create_event/models/event_category.dart';
+import 'package:fire_playground/features/create_event/models/event_details_model.dart';
+import 'package:fire_playground/features/create_event/providers/create_event_provider.dart';
+import 'package:fire_playground/features/create_event/providers/page_controller_provider.dart';
 import 'package:fire_playground/features/create_event/shared_layout/app_text_form_field.dart';
+import 'package:fire_playground/features/create_event/shared_layout/form_layout.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class EventDetailsLayout extends StatefulWidget {
-  const EventDetailsLayout({super.key, required this.formKey});
-  final GlobalKey<FormState> formKey;
+  const EventDetailsLayout({super.key});
 
   @override
   State<EventDetailsLayout> createState() => _EventDetailsLayoutState();
 }
 
 class _EventDetailsLayoutState extends State<EventDetailsLayout> {
+  final _detailsFormKey = GlobalKey<FormState>();
+
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 
@@ -18,20 +24,31 @@ class _EventDetailsLayoutState extends State<EventDetailsLayout> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: widget.formKey,
-      child: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          spacing: 8,
-          children: [
+    // final pageControllerProvider = Provider.of<PageControllerProvider>(context);
+    // final createEventProvider = Provider.of<CreateEventProvider>(context);
+    return Consumer2<PageControllerProvider, CreateEventProvider>(
+        builder: (context, pageControllerProvider, createEventProvider, _) {
+      return FormLayout(
+          formKey: _detailsFormKey,
+          formFields: [
             _buildTitleForm(),
             _buildCategoryForm(),
             _buildDescriptionForm(),
           ],
-        ),
-      ),
-    );
+          onPressedAction: (_detailsFormKey.currentState != null &&
+                  _selectedItem != null &&
+                  _detailsFormKey.currentState!.validate())
+              ? () {
+                  createEventProvider.eventDetails = EventDetailsModel(
+                      title: _titleController.text,
+                      eventCategory: _selectedItem!,
+                      description: _descriptionController.text);
+                  pageControllerProvider.nextPage();
+                }
+              : null,
+          actionButtonLabel: 'Next',
+          hasPrevious: false);
+    });
   }
 
   Widget _buildTitleForm() {

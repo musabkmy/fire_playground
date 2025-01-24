@@ -29,7 +29,7 @@ class EventSpeakersLayoutState extends State<EventSpeakersLayout> {
           ),
           AppTextFormField(
             controller: _titleController,
-            title: 'Job Title',
+            title: 'Bio',
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
