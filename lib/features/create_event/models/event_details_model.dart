@@ -22,4 +22,8 @@ class EventDetailsModel {
       description: description ?? this.description,
     );
   }
+
+  @override
+  String toString() =>
+      'EventDetailsModel(title: $title, eventCategory: $eventCategory, description: $description)';
 }

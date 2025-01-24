@@ -23,6 +23,19 @@ class _EventDetailsLayoutState extends State<EventDetailsLayout> {
   EventCategory? _selectedItem;
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final eventDetails = Provider.of<CreateEventProvider>(context).eventDetails;
+    if (eventDetails != null) {
+      _titleController.text = eventDetails.title;
+      _descriptionController.text = eventDetails.description;
+      _selectedItem = eventDetails.eventCategory;
+    } else {
+      debugPrint('something went wrong');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     // final pageControllerProvider = Provider.of<PageControllerProvider>(context);
     // final createEventProvider = Provider.of<CreateEventProvider>(context);
@@ -30,6 +43,7 @@ class _EventDetailsLayoutState extends State<EventDetailsLayout> {
         builder: (context, pageControllerProvider, createEventProvider, _) {
       return FormLayout(
           formKey: _detailsFormKey,
+          unfocus: FocusScope.of(context).unfocus,
           formFields: [
             _buildTitleForm(),
             _buildCategoryForm(),

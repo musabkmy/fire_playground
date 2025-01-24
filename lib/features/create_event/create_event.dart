@@ -2,7 +2,6 @@ import 'package:fire_playground/features/create_event/data/create_event_data.dar
 import 'package:fire_playground/features/create_event/layouts/event_date_and_location_layout.dart';
 import 'package:fire_playground/features/create_event/layouts/event_details_layout.dart';
 import 'package:fire_playground/features/create_event/layouts/event_speakers_layout.dart';
-import 'package:fire_playground/features/create_event/providers/create_event_provider.dart';
 import 'package:fire_playground/features/create_event/providers/page_controller_provider.dart';
 import 'package:fire_playground/features/create_event/shared/rectangle_painter.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +15,6 @@ class CreateEvent extends StatefulWidget {
 }
 
 class _CreateEventState extends State<CreateEvent> {
-  final _dateAndLocationFormKey = GlobalKey<FormState>();
-
   @override
   Widget build(BuildContext context) {
     final pageControllerProvider = Provider.of<PageControllerProvider>(context);
@@ -45,8 +42,7 @@ class _CreateEventState extends State<CreateEvent> {
               itemBuilder: (context, index) => index == 0
                   ? EventDetailsLayout()
                   : index == 1
-                      ? EventDateAndLocationLayout(
-                          formKey: _dateAndLocationFormKey)
+                      ? EventDateAndLocationLayout()
                       : EventSpeakersLayout(),
             ),
           ),

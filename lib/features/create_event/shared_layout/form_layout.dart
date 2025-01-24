@@ -3,15 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class FormLayout extends StatelessWidget {
-  const FormLayout(
-      {super.key,
-      required this.formKey,
-      required this.formFields,
-      required this.onPressedAction,
-      required this.actionButtonLabel,
-      required this.hasPrevious});
+  const FormLayout({
+    super.key,
+    required this.formKey,
+    required this.unfocus,
+    required this.formFields,
+    required this.onPressedAction,
+    required this.actionButtonLabel,
+    required this.hasPrevious,
+  });
 
   final GlobalKey<FormState> formKey;
+  final Function()? unfocus;
   final List<Widget> formFields;
   final Function()? onPressedAction;
   final String actionButtonLabel;
@@ -24,12 +27,13 @@ class FormLayout extends StatelessWidget {
       child: Stack(
         children: [
           GestureDetector(
-            onTap: () => FocusScope.of(context).unfocus(),
+            onTap: unfocus,
           ),
           SingleChildScrollView(
             padding: EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
               spacing: 8,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: formFields,
             ),
           ),

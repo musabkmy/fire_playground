@@ -1,5 +1,10 @@
+import 'package:fire_playground/features/create_event/models/event_speaker_model.dart';
+import 'package:fire_playground/features/create_event/providers/create_event_provider.dart';
+import 'package:fire_playground/features/create_event/providers/page_controller_provider.dart';
 import 'package:fire_playground/features/create_event/shared_layout/app_text_form_field.dart';
+import 'package:fire_playground/features/create_event/shared_layout/form_layout.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class EventSpeakersLayout extends StatefulWidget {
   const EventSpeakersLayout({super.key});
@@ -9,7 +14,9 @@ class EventSpeakersLayout extends StatefulWidget {
 }
 
 class EventSpeakersLayoutState extends State<EventSpeakersLayout> {
-  final List<Map<String, String>> _speakers = [];
+  final _speakersFormKey = GlobalKey<FormState>();
+
+  final List<EventSpeakerModel> _speakers = [];
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
@@ -17,19 +24,51 @@ class EventSpeakersLayoutState extends State<EventSpeakersLayout> {
   int? _editingIndex;
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final speakers = Provider.of<CreateEventProvider>(context).speakers;
+    if (speakers.isNotEmpty) {
+      setState(() {
+        _speakers.addAll(speakers);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 24.0),
-      child: Column(
-        spacing: 16,
-        children: [
+    return Consumer2<CreateEventProvider, PageControllerProvider>(
+        builder: (context, createEventProvider, pageControllerProvider, _) {
+      return FormLayout(
+        formKey: _speakersFormKey,
+        unfocus: FocusScope.of(context).unfocus,
+        onPressedAction: _speakers.isNotEmpty
+            ? () {
+                createEventProvider.speakers = _speakers;
+                pageControllerProvider.nextPage();
+              }
+            : null,
+        hasPrevious: true,
+        actionButtonLabel: 'Create Event',
+        formFields: [
           AppTextFormField(
             controller: _nameController,
             title: 'Speaker Name',
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Please enter a name';
+              }
+              return null;
+            },
           ),
           AppTextFormField(
             controller: _titleController,
             title: 'Bio',
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Please enter a title';
+              }
+              return null;
+            },
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -61,8 +100,8 @@ class EventSpeakersLayoutState extends State<EventSpeakersLayout> {
             ],
           ),
         ],
-      ),
-    );
+      );
+    });
   }
 
   // Save or update a speaker
@@ -73,14 +112,11 @@ class EventSpeakersLayoutState extends State<EventSpeakersLayout> {
     if (name.isNotEmpty && title.isNotEmpty) {
       setState(() {
         if (_editingIndex != null) {
-          // Update existing speaker
-          _speakers[_editingIndex!] = {'name': name, 'title': title};
+          _speakers[_editingIndex!].copyWith(name: name, bio: title);
           _editingIndex = null; // Reset editing index
         } else {
-          // Add new speaker
-          _speakers.add({'name': name, 'title': title});
+          _speakers.add(EventSpeakerModel(name: name, bio: title));
         }
-        // Clear text fields
         _nameController.clear();
         _titleController.clear();
       });
@@ -106,8 +142,8 @@ class EventSpeakersLayoutState extends State<EventSpeakersLayout> {
                 itemBuilder: (context, index) {
                   final speaker = _speakers[index];
                   return ListTile(
-                    title: Text(speaker['name']!),
-                    subtitle: Text(speaker['title']!),
+                    title: Text(speaker.name),
+                    subtitle: Text(speaker.bio),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -140,8 +176,8 @@ class EventSpeakersLayoutState extends State<EventSpeakersLayout> {
   void _editSpeaker(int index) {
     setState(() {
       _editingIndex = index;
-      _nameController.text = _speakers[index]['name']!;
-      _titleController.text = _speakers[index]['title']!;
+      _nameController.text = _speakers[index].name;
+      _titleController.text = _speakers[index].bio;
     });
   }
 
