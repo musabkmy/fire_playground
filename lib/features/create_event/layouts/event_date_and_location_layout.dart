@@ -164,7 +164,6 @@ class _EventDateAndLocationLayoutState
                   onChanged: (EventLocationType? value) {
                     setState(() {
                       _selectedLocationOption = value;
-                      _locationDescriptionController.text = '';
                     });
                   },
                 ),

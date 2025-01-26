@@ -38,4 +38,11 @@ class CreateEventProvider extends ChangeNotifier {
   List<EventSpeakerModel> get speakers => _createEventModel.speakers;
 
   bool isSpeakersEmpty() => _createEventModel.speakers.isEmpty;
+
+  bool isCreateEventModelCreated() =>
+      _createEventModel.isCreateEventModelCreated();
+
+  Map<String, dynamic> toFirestore() => isCreateEventModelCreated()
+      ? _createEventModel.toMap()
+      : throw ArgumentError('Invalid Access');
 }

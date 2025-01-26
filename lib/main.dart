@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fire_playground/app.dart';
 import 'package:fire_playground/error_layout.dart';
+import 'package:fire_playground/features/create_event/models/create_event_model.dart';
+import 'package:fire_playground/features/create_event/models/event_speaker_model.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -33,25 +35,24 @@ void main() async {
   );
   final db = FirebaseFirestore.instance;
 
-  // final event = <String, dynamic>{
-  //   "title": "Problem Solving",
-  //   "category": "Workshop",
-  //   "Description":
-  //       "lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum"
-  // };
-
-  // db.collection("events").add(event).then((DocumentReference doc) =>
-  //     debugPrint('DocumentSnapshot added with ID: ${doc.id}'));
-
   try {
     await db.collection("events").get().then((event) {
       for (var doc in event.docs) {
-        debugPrint("${doc.id} => ${doc.data()}");
+        final event = CreateEventModel.fromMap(doc.data());
+        debugPrint("${doc.id} => ${event.toString()}");
       }
     });
   } catch (e) {
     debugPrint(e.toString());
   }
+
+  final updateSpeakers = db.collection("events").doc("ONSWC7iGHm6bxEqj8ZOi");
+
+  updateSpeakers.update({
+    "speakers": FieldValue.arrayUnion([
+      EventSpeakerModel(name: 'Musa', bio: 'Professional Developer').toMap()
+    ]),
+  });
 
   // FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 

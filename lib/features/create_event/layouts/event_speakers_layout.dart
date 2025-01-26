@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fire_playground/features/create_event/models/event_speaker_model.dart';
 import 'package:fire_playground/features/create_event/providers/create_event_provider.dart';
 import 'package:fire_playground/features/create_event/providers/page_controller_provider.dart';
@@ -44,7 +45,23 @@ class EventSpeakersLayoutState extends State<EventSpeakersLayout> {
         onPressedAction: _speakers.isNotEmpty
             ? () {
                 createEventProvider.speakers = _speakers;
-                pageControllerProvider.nextPage();
+                if (createEventProvider.isCreateEventModelCreated()) {
+                  final db = FirebaseFirestore.instance;
+
+                  db
+                      .collection("events")
+                      .add(createEventProvider.toFirestore())
+                      .then((DocumentReference doc) => debugPrint(
+                          'DocumentSnapshot added with ID: ${doc.id}'));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                      'Please fill in all the required fields',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    backgroundColor: Colors.redAccent,
+                  ));
+                }
               }
             : null,
         hasPrevious: true,
@@ -112,11 +129,12 @@ class EventSpeakersLayoutState extends State<EventSpeakersLayout> {
     if (name.isNotEmpty && title.isNotEmpty) {
       setState(() {
         if (_editingIndex != null) {
-          _speakers[_editingIndex!].copyWith(name: name, bio: title);
-          _editingIndex = null; // Reset editing index
+          _speakers[_editingIndex!] = EventSpeakerModel(name: name, bio: title);
+          _editingIndex = null;
         } else {
           _speakers.add(EventSpeakerModel(name: name, bio: title));
         }
+        FocusScope.of(context).unfocus();
         _nameController.clear();
         _titleController.clear();
       });
