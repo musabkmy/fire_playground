@@ -13,12 +13,16 @@ dependencies:
   firebase_analytics: ^11.3.6
   cloud_firestore: ^5.6.1
   firebase_auth: ^5.3.4
-  firebase_core: ^3.9.0
+  firebase_core: ^3.10.1
   flutter:
     sdk: flutter
   google_sign_in: ^6.2.2
   provider: ^6.1.2
   intl: ^0.20.1
+  freezed_annotation: ^2.4.4
+  # google_ml_kit: ^0.19.0
+  image_picker: ^1.1.2
+  google_mlkit_text_recognition: ^0.14.0
   
 
 dev_dependencies:
@@ -26,6 +30,7 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^5.0.0
+  freezed: ^2.4.4
 
 flutter:
   uses-material-design: true
